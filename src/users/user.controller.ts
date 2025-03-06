@@ -74,3 +74,4 @@ function updateSchema(req: Request, res: Response, next: any) {
   }).with("password", "confirmPassword");
   validateRequest(req, next, schema);
 }
+module.exports = router;

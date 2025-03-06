@@ -2,6 +2,16 @@ import bcrypt from "bcryptjs";
 import { AppDataSource } from "../config/db";
 import { User } from "../users/user.model";
 
+// Define CreateUserDto interface for user creation
+interface CreateUserDto {
+  title: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string; // Include password field in the DTO
+  role: string;
+}
+
 const userRepository = AppDataSource.getRepository(User);
 
 export const userService = {
@@ -12,7 +22,7 @@ export const userService = {
   delete: _delete,
 };
 
-async function getAll() {
+async function getAll(): Promise<User[]> {
   return await userRepository.find({
     select: [
       "id",
@@ -26,22 +36,30 @@ async function getAll() {
   });
 }
 
-async function getById(id: number) {
-  return await userRepository.findOne({ where: { id } }); // ✅ Ensures it returns a single user
+async function getById(id: number): Promise<User | null> {
+  return await userRepository.findOne({ where: { id } });
 }
 
-async function create(params: any) {
-  const user = userRepository.create(params);
+async function create(params: CreateUserDto) {
+  // Use the CreateUserDto interface
+  const user = userRepository.create({
+    title: params.title,
+    firstName: params.firstName,
+    lastName: params.lastName,
+    email: params.email,
+    role: params.role,
+  });
 
+  // Hash the password if it's saprovided
   if (params.password) {
-    // user.passwordHash = await bcrypt.hash(params.password, 10);
+    user.passwordHash = await bcrypt.hash(params.password, 10);
   }
 
   await userRepository.save(user);
   return user;
 }
 
-async function update(id: number, params: any) {
+async function update(id: number, params: Partial<User>) {
   const user = await getById(id);
   if (!user) throw "User not found";
   Object.assign(user, params);
