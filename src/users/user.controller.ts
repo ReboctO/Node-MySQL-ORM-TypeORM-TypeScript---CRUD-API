@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import Joi from "joi";
 import { validateRequest } from "../middleware/validate-request";
-import { Role } from "../helpers/role";
+import { Role } from "../../helpers/role";
 import { userService } from "../users/user.service";
 
 const router = Router();
