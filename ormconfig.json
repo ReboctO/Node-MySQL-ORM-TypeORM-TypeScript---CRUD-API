@@ -1,12 +1,10 @@
 {
-    "type": "mysql",
-    "host": "localhost",
-    "port": 3306,
-    "username": "root",
-    "password": "yourpassword",
-    "database": "yourdatabase",
-    "entities": [
-        "src/entities/**/*.ts"
-    ],
-    "synchronize": true
+  "type": "mysql",
+  "host": "localhost",
+  "port": 3306,
+  "username": "root",
+  "password": "",
+  "database": "node-mysql-crud-api",
+  "entities": ["src/entities/**/*.ts"],
+  "synchronize": true
 }

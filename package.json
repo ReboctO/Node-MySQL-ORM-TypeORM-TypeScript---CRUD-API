@@ -6,6 +6,7 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.13.9",
+    "@types/sequelize": "^4.28.20",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
@@ -20,6 +21,7 @@
     "morgan": "^1.10.0",
     "mysql2": "^3.12.0",
     "reflect-metadata": "^0.2.2",
+    "sequelize": "^6.37.6",
     "typeorm": "^0.3.21"
   }
 }
