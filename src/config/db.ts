@@ -1,30 +1,21 @@
-const config = require("config.json");
-const mysql = require("mysql2/promise");
-const { Sequelize } = require("sequelize");
+import "reflect-metadata";
+import { DataSource } from "typeorm";
+import { User } from "../users/user.model";
 
-module.exports = db = {};
+export const AppDataSource = new DataSource({
+  type: "mysql",
+  host: process.env.DB_HOST || "localhost",
+  port: Number(process.env.DB_PORT) || 4000,
+  username: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "ncmapi",
+  synchronize: true,
+  logging: false,
+  entities: [User],
+  migrations: [],
+  subscribers: [],
+});
 
-initialize();
-
-async function initialize() {
-  // create db if it doesn't already exist
-  const { host, port, user, password, database } = config.database;
-  const connection = await mysql.createConnection({
-    host,
-    port,
-    user,
-    password,
-  });
-  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
-
-  // connect to db
-  const sequelize = new Sequelize(database, user, password, {
-    dialect: "mysql",
-  });
-
-  // init models and add them to the exported db object
-  db.User = require("../users/user.model")(sequelize);
-
-  // sync all models with database
-  await sequelize.sync({ alter: true });
-}
+AppDataSource.initialize()
+  .then(() => console.log("Database connected"))
+  .catch((error) => console.log(error));

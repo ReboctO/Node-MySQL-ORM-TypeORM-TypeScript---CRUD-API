@@ -1,11 +1,10 @@
-const express = require("express");
-const router = express.Router();
-const Joi = require("joi");
-const validateRequest = require("_middleware/validate-request");
-const Role = require("_helpers/role");
-const userService = require("./user.service");
+import { Request, Response, Router } from "express";
+import Joi from "joi";
+import { validateRequest } from "../middleware/validate-request";
+import { Role } from "../helpers/role";
+import { userService } from "../users/user.service";
 
-// routes
+const router = Router();
 
 router.get("/", getAll);
 router.get("/:id", getById);
@@ -13,46 +12,44 @@ router.post("/", createSchema, create);
 router.put("/:id", updateSchema, update);
 router.delete("/:id", _delete);
 
-module.exports = router;
+export default router;
 
-// route functions
-
-function getAll(req, res, next) {
+function getAll(req: Request, res: Response) {
   userService
     .getAll()
     .then((users) => res.json(users))
-    .catch(next);
-}
-function getById(req, res, next) {
-  userService
-    .getById(req.params.id)
-    .then((user) => res.json(user))
-    .catch(next);
+    .catch(res.json);
 }
 
-function create(req, res, next) {
+function getById(req: Request, res: Response) {
+  userService
+    .getById(Number(req.params.id))
+    .then((user) => res.json(user))
+    .catch(res.json);
+}
+
+function create(req: Request, res: Response) {
   userService
     .create(req.body)
     .then(() => res.json({ message: "User created" }))
-    .catch(next);
+    .catch(res.json);
 }
 
-function update(req, res, next) {
+function update(req: Request, res: Response) {
   userService
-    .update(req.params.id, req.body)
+    .update(Number(req.params.id), req.body)
     .then(() => res.json({ message: "User updated" }))
-    .catch(next);
+    .catch(res.json);
 }
 
-function _delete(req, res, next) {
+function _delete(req: Request, res: Response) {
   userService
-    .delete(req.params.id)
+    .delete(Number(req.params.id))
     .then(() => res.json({ message: "User deleted" }))
-    .catch(next);
+    .catch(res.json);
 }
-// schema functions
 
-function createSchema(req, res, next) {
+function createSchema(req: Request, res: Response, next: any) {
   const schema = Joi.object({
     title: Joi.string().required(),
     firstName: Joi.string().required(),
@@ -65,7 +62,7 @@ function createSchema(req, res, next) {
   validateRequest(req, next, schema);
 }
 
-function updateSchema(req, res, next) {
+function updateSchema(req: Request, res: Response, next: any) {
   const schema = Joi.object({
     title: Joi.string().empty(""),
     firstName: Joi.string().empty(""),

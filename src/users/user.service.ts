@@ -1,7 +1,10 @@
-const bcrypt = require("bcryptjs");
-const db = require("_helpers/db");
+import bcrypt from "bcryptjs";
+import { AppDataSource } from "../config/db";
+import { User } from "../users/user.model";
 
-module.exports = {
+const userRepository = AppDataSource.getRepository(User);
+
+export const userService = {
   getAll,
   getById,
   create,
@@ -10,56 +13,41 @@ module.exports = {
 };
 
 async function getAll() {
-  return await db.User.findAll();
+  return await userRepository.find({
+    select: [
+      "id",
+      "title",
+      "firstName",
+      "lastName",
+      "email",
+      "role",
+      "passwordHash",
+    ],
+  });
 }
 
-async function getById(id) {
-  return await getUser(id);
+async function getById(id: number) {
+  return await userRepository.findOne({ where: { id } }); // ✅ Ensures it returns a single user
 }
-async function create(params) {
-  // validate
-  if (await db.User.findOne({ where: { email: params.email } })) {
-    throw 'Email "' + params.email + '" is already registered';
-  }
 
-  const user = new db.User(params);
+async function create(params: any) {
+  const user = userRepository.create(params);
 
-  // hash password
-  user.passwordHash = await bcrypt.hash(params.password, 10);
-
-  // save user
-  await user.save();
-}
-async function update(id, params) {
-  const user = await getUser(id);
-
-  // validate
-  const usernameChanged = params.username && user.username !== params.username;
-  if (
-    usernameChanged &&
-    (await db.User.findOne({ where: { username: params.username } }))
-  ) {
-    throw 'Username "' + params.username + '" is already taken';
-  }
-
-  // hash password if it was entered
   if (params.password) {
-    params.passwordHash = await bcrypt.hash(params.password, 10);
+    // user.passwordHash = await bcrypt.hash(params.password, 10);
   }
 
-  // copy params to user and save
-  Object.assign(user, params);
-  await user.save();
-}
-
-async function _delete(id) {
-  const user = await getUser(id);
-  await user.destroy();
-}
-// helper functions
-
-async function getUser(id) {
-  const user = await db.User.findByPk(id);
-  if (!user) throw "User not found";
+  await userRepository.save(user);
   return user;
+}
+
+async function update(id: number, params: any) {
+  const user = await getById(id);
+  if (!user) throw "User not found";
+  Object.assign(user, params);
+  await userRepository.save(user);
+}
+
+async function _delete(id: number) {
+  await userRepository.delete(id);
 }

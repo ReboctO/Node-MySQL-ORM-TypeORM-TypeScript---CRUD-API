@@ -1,12 +1,14 @@
-module.exports = validateRequest;
+import { Request, Response, NextFunction } from "express";
+import { ObjectSchema } from "joi";
 
-function validateRequest(req, next, schema) {
-  const options = {
-    abortEarly: false, // include all errors
-    allowUnknown: true, // ignore unknown props
-    stripUnknown: true, // remove unknown props
-  };
+export function validateRequest(
+  req: Request,
+  next: NextFunction,
+  schema: ObjectSchema
+) {
+  const options = { abortEarly: false, allowUnknown: true, stripUnknown: true };
   const { error, value } = schema.validate(req.body, options);
+
   if (error) {
     next(`Validation error: ${error.details.map((x) => x.message).join(", ")}`);
   } else {

@@ -1,27 +1,25 @@
-const { DataTypes } = require("sequelize");
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
-module.exports = model;
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id!: number; // Using `!` to tell TypeScript it will be assigned
 
-function model(sequelize) {
-  const attributes = {
-    email: { type: DataTypes.STRING, allowNull: false },
-    passwordHash: { type: DataTypes.STRING, allowNull: false },
-    title: { type: DataTypes.STRING, allowNull: false },
-    firstName: { type: DataTypes.STRING, allowNull: false },
-    lastName: { type: DataTypes.STRING, allowNull: false },
-    role: { type: DataTypes.STRING, allowNull: false },
-  };
+  @Column({ type: "varchar", length: 100 })
+  title!: string;
 
-  const options = {
-    defaultScope: {
-      // exclude password hash by default
-      attributes: { exclude: ["passwordHash"] },
-    },
-    scopes: {
-      // include hash with this scope
-      withHash: { attributes: {} },
-    },
-  };
+  @Column({ type: "varchar", length: 100 })
+  firstName!: string;
 
-  return sequelize.define("User", attributes, options);
+  @Column({ type: "varchar", length: 100 })
+  lastName!: string;
+
+  @Column({ type: "varchar", length: 255, unique: true })
+  email!: string;
+
+  @Column({ type: "varchar", length: 255, select: false }) // Prevent exposing passwords
+  passwordHash!: string;
+
+  @Column({ type: "varchar", length: 20 })
+  role!: string;
 }
